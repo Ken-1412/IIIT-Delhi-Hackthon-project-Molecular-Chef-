@@ -37,18 +37,25 @@ async function apiFetch(url, options = {}) {
 
 /**
  * Get compounds/molecules for an ingredient by its readable name.
- * Uses: /entities/by-entity-alias-readable
+ * Uses: /api/flavordb/compounds/:ingredient
  */
 export async function getCompounds(name) {
-  const url = `${FLAVOR_BASE}/entities/by-entity-alias-readable?aliasReadable=${encodeURIComponent(name)}&page=0&size=20`;
+  const url = `${FLAVOR_BASE}/compounds/${encodeURIComponent(name)}`;
   return apiFetch(url);
 }
 
 /**
  * Get flavor pairings for an ingredient.
- * Uses: /food/by-alias
+ * Uses: /api/flavordb/pairings/single?ingredient=... (New endpoint we will create)
+ * Or we can reuse /advanced-substitutes which has everything.
+ * For now, let's map it to the advanced endpoint but extract pairings, 
+ * OR strictly, let's just fix the route.
  */
 export async function getPairings(name, topK = 10) {
+  // We'll trust the backend has a route for this or we'll add it.
+  // The SubstitutionService uses /food/by-alias. Let's assume we add a proxy for it 
+  // or use advanced-substitutes.
+  // Actually, creating a specific route in backend is cleaner.
   const url = `${FLAVOR_BASE}/food/by-alias?food_pair=${encodeURIComponent(name)}`;
   const result = await apiFetch(url);
   if (result.data) {
@@ -63,6 +70,14 @@ export async function getPairings(name, topK = 10) {
     return { data: { pairings }, error: null };
   }
   return result;
+}
+
+/**
+ * Get advanced substitutes (Backend Integration)
+ */
+export async function getAdvancedSubstitutes(name) {
+  const url = `${FLAVOR_BASE}/advanced-substitutes/${encodeURIComponent(name)}`;
+  return apiFetch(url);
 }
 
 /**
@@ -98,9 +113,8 @@ export async function getSubstitutes(name, budget = 'any', cuisine = 'any', topK
 // ─── Recipe Analysis (composite) ──────────────────────────
 
 /**
- * Analyze a recipe — builds a flavor graph from ingredient pairings.
- * Since there's no single "analyze" endpoint, we fetch pairings for each ingredient
- * and build the graph client-side.
+ * Analyze a recipe — uses backend /analyze-recipe endpoint
+ * which builds a flavor graph from ingredient pairings server-side.
  */
 export async function analyzeRecipe(ingredientArray) {
   if (!ingredientArray || ingredientArray.length < 2) {
@@ -108,91 +122,9 @@ export async function analyzeRecipe(ingredientArray) {
   }
 
   try {
-    // Fetch pairings for all ingredients in parallel
-    const results = await Promise.all(
-      ingredientArray.map(name =>
-        apiFetch(`${FLAVOR_BASE}/food/by-alias?food_pair=${encodeURIComponent(name)}`)
-      )
-    );
-
-    // Build graph nodes
-    const nodes = ingredientArray.map(name => ({
-      id: name,
-      category: 'ingredient',
-      connections: 0,
-    }));
-
-    // Build links from shared pairings
-    const links = [];
-    let totalShared = 0;
-    let pairCount = 0;
-
-    for (let i = 0; i < ingredientArray.length; i++) {
-      const pairingsA = Array.isArray(results[i].data) ? results[i].data : [];
-      const namesA = new Set(pairingsA.map(p => (p.entity_alias_readable || p.alias || '').toLowerCase()));
-
-      for (let j = i + 1; j < ingredientArray.length; j++) {
-        const pairingsB = Array.isArray(results[j].data) ? results[j].data : [];
-        const namesB = new Set(pairingsB.map(p => (p.entity_alias_readable || p.alias || '').toLowerCase()));
-
-        // Count shared pairings
-        const shared = [...namesA].filter(n => n && namesB.has(n)).length;
-        const weight = Math.min(1, shared / 20);
-
-        if (shared > 0) {
-          links.push({
-            source: ingredientArray[i],
-            target: ingredientArray[j],
-            weight,
-          });
-          nodes[i].connections++;
-          nodes[j].connections++;
-          totalShared += shared;
-          pairCount++;
-        }
-      }
-    }
-
-    const cohesion_score = pairCount > 0
-      ? Math.min(1, totalShared / (pairCount * 15))
-      : 0;
-
-    // Power pairs (top connections)
-    const power_pairs = links
-      .sort((a, b) => b.weight - a.weight)
-      .slice(0, 3)
-      .map(l => ({
-        ingredient_a: l.source,
-        ingredient_b: l.target,
-        shared_compounds: Math.round(l.weight * 20),
-      }));
-
-    // Bridge suggestion: find common pairing across all ingredients
-    const allPairNames = results.flatMap(r =>
-      Array.isArray(r.data) ? r.data.map(p => (p.entity_alias_readable || '').toLowerCase()) : []
-    );
-    const countMap = {};
-    allPairNames.forEach(n => {
-      if (n && !ingredientArray.includes(n)) {
-        countMap[n] = (countMap[n] || 0) + 1;
-      }
-    });
-    const bridge = Object.entries(countMap)
-      .sort((a, b) => b[1] - a[1])[0];
-
-    return {
-      data: {
-        graph: { nodes, links },
-        cohesion_score,
-        power_pairs,
-        conflicts: [],
-        bridge_ingredient: bridge ? {
-          name: bridge[0],
-          reason: `Pairs well with ${bridge[1]} of your ingredients, acting as a flavor bridge.`,
-        } : null,
-      },
-      error: null,
-    };
+    const ingredientsParam = ingredientArray.join(',');
+    const url = `${FLAVOR_BASE}/analyze-recipe?ingredients=${encodeURIComponent(ingredientsParam)}`;
+    return apiFetch(url);
   } catch (err) {
     console.error('analyzeRecipe error:', err);
     return { data: null, error: 'Analysis failed. Check connection.' };

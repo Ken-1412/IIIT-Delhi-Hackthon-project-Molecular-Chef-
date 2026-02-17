@@ -48,30 +48,98 @@ export default function FlavorGraph({ width = 600, height = 500 }) {
             .join("g")
             .call(drag(simulation));
 
-        // Node: Glow Circle (Outer)
-        node.append("circle")
-            .attr("r", d => 24 + (d.connections || 0))
+        // Define hexagon path generator
+        const hexagonPath = (radius) => {
+            const points = [];
+            for (let i = 0; i < 6; i++) {
+                const angle = (Math.PI / 3) * i - Math.PI / 2;
+                points.push([
+                    radius * Math.cos(angle),
+                    radius * Math.sin(angle)
+                ]);
+            }
+            return `M${points.map(p => p.join(',')).join('L')}Z`;
+        };
+
+        // Node: Outer Glow Hexagon
+        node.append("path")
+            .attr("d", d => hexagonPath(28 + (d.connections || 0) * 1.5))
             .attr("fill", "none")
             .attr("stroke", d => getNodeColor(d.category))
-            .attr("stroke-opacity", 0.2)
-            .attr("stroke-width", 1);
+            .attr("stroke-opacity", 0.3)
+            .attr("stroke-width", 2)
+            .attr("filter", "url(#glow)");
 
-        // Node: Main Circle
-        node.append("circle")
-            .attr("r", d => 12 + (d.connections || 0) * 2)
-            .attr("fill", d => getNodeColor(d.category))
-            .attr("stroke", "var(--bg-primary)")
+        // Node: Inner Hexagon Background
+        node.append("path")
+            .attr("d", d => hexagonPath(20 + (d.connections || 0) * 1.5))
+            .attr("fill", d => {
+                const color = d3.color(getNodeColor(d.category));
+                color.opacity = 0.15;
+                return color.toString();
+            })
+            .attr("stroke", d => getNodeColor(d.category))
             .attr("stroke-width", 2)
             .attr("class", "cursor-pointer transition-all duration-300");
+
+        // Node: Molecular Pattern (small circles inside hexagon)
+        const patternGroup = node.append("g")
+            .attr("opacity", 0.4);
+
+        // Add 3 small circles in triangular pattern
+        [-6, 6].forEach((xOffset, i) => {
+            patternGroup.append("circle")
+                .attr("cx", xOffset)
+                .attr("cy", i === 0 ? -3 : 3)
+                .attr("r", 2)
+                .attr("fill", d => getNodeColor(d.category));
+        });
+        patternGroup.append("circle")
+            .attr("cx", 0)
+            .attr("cy", 6)
+            .attr("r", 2)
+            .attr("fill", d => getNodeColor(d.category));
+
+        // Node: Center Icon/Symbol
+        node.append("text")
+            .text(d => getCategoryIcon(d.category))
+            .attr("y", -2)
+            .attr("text-anchor", "middle")
+            .attr("fill", d => getNodeColor(d.category))
+            .attr("font-size", 16)
+            .attr("pointer-events", "none")
+            .attr("opacity", 0.8);
 
         // Node: Label
         node.append("text")
             .text(d => d.id)
-            .attr("y", d => 28 + (d.connections || 0) * 2)
+            .attr("y", d => 35 + (d.connections || 0) * 1.5)
             .attr("text-anchor", "middle")
             .attr("fill", "var(--text-secondary)")
             .attr("font-family", "var(--font-mono)")
             .attr("font-size", 11)
+            .attr("font-weight", 500)
+            .attr("pointer-events", "none");
+
+        // Node: Connection Badge (if has connections)
+        node.filter(d => (d.connections || 0) > 2)
+            .append("circle")
+            .attr("cx", 15)
+            .attr("cy", -15)
+            .attr("r", 8)
+            .attr("fill", "var(--accent-amber)")
+            .attr("stroke", "var(--bg-primary)")
+            .attr("stroke-width", 2);
+
+        node.filter(d => (d.connections || 0) > 2)
+            .append("text")
+            .text(d => d.connections)
+            .attr("x", 15)
+            .attr("y", -11)
+            .attr("text-anchor", "middle")
+            .attr("fill", "var(--bg-primary)")
+            .attr("font-size", 10)
+            .attr("font-weight", "bold")
             .attr("pointer-events", "none");
 
         // Animation: Scale in
@@ -87,9 +155,11 @@ export default function FlavorGraph({ width = 600, height = 500 }) {
             link.attr("stroke", l => (l.source === d || l.target === d) ? "var(--accent-amber)" : "var(--border-bright)")
                 .attr("stroke-opacity", l => (l.source === d || l.target === d) ? 1 : 0.1);
 
-            // Highlight node
-            d3.select(event.currentTarget).select("circle:nth-child(2)")
-                .attr("stroke", "var(--text-primary)");
+            // Highlight node - scale up hexagon
+            d3.select(event.currentTarget).select("path:nth-child(2)")
+                .transition().duration(200)
+                .attr("d", hexagonPath(24 + (d.connections || 0) * 1.5))
+                .attr("stroke-width", 3);
 
             // Tooltip
             setTooltip({
@@ -100,8 +170,10 @@ export default function FlavorGraph({ width = 600, height = 500 }) {
         })
             .on("mouseout", (event, d) => {
                 link.attr("stroke", "var(--border-bright)").attr("stroke-opacity", 0.6);
-                d3.select(event.currentTarget).select("circle:nth-child(2)")
-                    .attr("stroke", "var(--bg-primary)");
+                d3.select(event.currentTarget).select("path:nth-child(2)")
+                    .transition().duration(200)
+                    .attr("d", hexagonPath(20 + (d.connections || 0) * 1.5))
+                    .attr("stroke-width", 2);
                 setTooltip(null);
             });
 
@@ -162,6 +234,26 @@ export default function FlavorGraph({ width = 600, height = 500 }) {
         return map[category?.toLowerCase()] || '#a09070';
     }
 
+    // Helper: Category Icons
+    function getCategoryIcon(category) {
+        const iconMap = {
+            herb: '🌿',
+            spice: '🌶️',
+            fruit: '🍊',
+            vegetable: '🥬',
+            protein: '🥩',
+            meet: '🥩',
+            dairy: '🧀',
+            fungus: '🍄',
+            flower: '🌸',
+            nut: '🥜',
+            grain: '🌾',
+            fat: '🧈',
+            sweetener: '🍯',
+        };
+        return iconMap[category?.toLowerCase()] || '⬡';
+    }
+
     return (
         <div ref={containerRef} className="relative w-full h-full min-h-[500px] bg-bg-surface/30 rounded-xl border border-border overflow-hidden">
             {/* Empty State */}
@@ -188,7 +280,18 @@ export default function FlavorGraph({ width = 600, height = 500 }) {
                 </div>
             )}
 
-            <svg ref={svgRef} className="w-full h-full block" />
+            <svg ref={svgRef} className="w-full h-full block">
+                <defs>
+                    {/* Glow filter for hexagon nodes */}
+                    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                        <feMerge>
+                            <feMergeNode in="coloredBlur" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+            </svg>
 
             {/* Tooltip */}
             {tooltip && (

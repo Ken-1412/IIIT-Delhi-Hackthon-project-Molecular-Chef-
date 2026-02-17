@@ -10651,13 +10651,24 @@ function RecipeBuilder() {
     setInputValue("");
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-6xl mx-auto", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("header", { className: "mb-10 hex-bg py-8 border-b border-border/50", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "font-display italic text-4xl mb-2 text-text-primary", children: "Flavor Network Builder" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-body text-text-secondary text-sm max-w-2xl", children: "Discover the hidden molecular chemistry between your ingredients. Use the graph to identify clusters of flavor compatibility." })
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-12 text-center animate-fadeUp opacity-0", style: { animationDelay: "100ms", animationFillMode: "forwards" }, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "inline-block mb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-accent-amber", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-[1px] bg-accent-amber/40" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-mono text-[10px] uppercase tracking-[0.3em]", children: "AI-Powered Flavor Science" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-[1px] bg-accent-amber/40" })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "font-display italic text-5xl mb-4 text-text-primary bg-gradient-to-r from-text-primary via-accent-amber to-text-primary bg-clip-text", style: { WebkitBackgroundClip: "text" }, children: "Flavor Network Builder" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-body text-text-secondary text-base max-w-2xl mx-auto leading-relaxed", children: "Discover the hidden molecular chemistry between your ingredients. Build recipes based on shared flavor compounds, not guesswork." })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-10 flex items-center gap-4 opacity-0 animate-fadeUp", style: { animationDelay: "200ms", animationFillMode: "forwards" }, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 h-[1px] bg-gradient-to-r from-transparent via-border to-border" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-2 h-2 rotate-45 border border-accent-amber/40" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 h-[1px] bg-gradient-to-l from-transparent via-border to-border" })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-12 gap-12", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "lg:col-span-4 space-y-8", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { onSubmit: handleSubmit, className: "relative group", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -inset-0.5 bg-gradient-to-r from-accent-amber/0 via-accent-amber/20 to-accent-amber/0 rounded-lg opacity-0 group-focus-within:opacity-100 blur transition-opacity duration-500" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -10667,19 +10678,28 @@ function RecipeBuilder() {
               onChange: (e) => setInputValue(e.target.value),
               placeholder: "Add an ingredient (e.g. 'Basil')...",
               className: clsx(
-                "w-full bg-bg-elevated border border-border px-4 py-3 rounded-lg text-text-primary outline-none transition-all duration-300",
-                "focus:border-accent-amber focus:ring-1 focus:ring-accent-amber/50 placeholder:italic placeholder:text-text-muted font-body"
+                "relative w-full bg-bg-elevated border border-border px-4 py-3.5 rounded-lg text-text-primary outline-none transition-all duration-300",
+                "focus:border-accent-amber focus:ring-2 focus:ring-accent-amber/30 focus:bg-bg-surface",
+                "placeholder:italic placeholder:text-text-muted font-body",
+                "hover:border-border-bright"
               )
             }
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute right-3 top-3 text-border-bright group-focus-within:text-accent-amber transition-colors", children: "↵" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute right-3 top-3.5 text-border-bright group-focus-within:text-accent-amber transition-all duration-300 group-focus-within:scale-110", children: "↵" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-2 min-h-[40px]", children: [
-          ingredients.map((ing) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-            IngredientTag,
+          ingredients.map((ing, idx) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
             {
-              name: ing,
-              onRemove: removeIngredient
+              className: "animate-scaleIn",
+              style: { animationDelay: `${idx * 50}ms` },
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                IngredientTag,
+                {
+                  name: ing,
+                  onRemove: removeIngredient
+                }
+              )
             },
             ing
           )),
@@ -11317,6 +11337,33 @@ function TechniqueGuide() {
         btn
       )) })
     ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-12", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 mb-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-[1px] bg-accent-amber" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "font-mono text-[11px] uppercase tracking-[0.2em] text-accent-amber", children: "Watch & Learn" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 h-[1px] bg-border" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-2 md:grid-cols-4 gap-4", children: [
+        { id: "psSkthG_2Pw", label: "Spherification" },
+        { id: "Elbzl5I2HTA", label: "Foaming" },
+        { id: "E3kxcWHyTg8", label: "Gel Noodles" },
+        { id: "s3mAuX3mZnY", label: "Plating" }
+      ].map((vid) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "group", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative aspect-[9/16] rounded-xl overflow-hidden border border-border bg-bg-elevated transition-all duration-300 group-hover:border-accent-amber/40 group-hover:shadow-[0_0_20px_rgba(232,160,48,0.1)]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "iframe",
+          {
+            src: `https://www.youtube.com/embed/${vid.id}?rel=0`,
+            title: vid.label,
+            allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+            allowFullScreen: true,
+            loading: "lazy",
+            className: "absolute inset-0 w-full h-full",
+            style: { border: "none" }
+          }
+        ) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-center font-mono text-[9px] uppercase tracking-widest text-text-muted group-hover:text-accent-amber transition-colors", children: vid.label })
+      ] }, vid.id)) })
+    ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-8", children: filteredTechniques.map((tech, idx) => /* @__PURE__ */ jsxRuntimeExports.jsx(
       "div",
       {
@@ -11458,4 +11505,4 @@ function App() {
 client.createRoot(document.getElementById("root")).render(
   /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}) })
 );
-//# sourceMappingURL=index-DKG69eZo.js.map
+//# sourceMappingURL=index-cJ3owL_-.js.map

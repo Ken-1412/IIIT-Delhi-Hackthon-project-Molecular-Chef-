@@ -10,7 +10,7 @@ import TechniqueGuide from '../techniques/TechniqueGuide';
 import TechniqueSlider3D from '../shared/TechniqueSlider3D';
 
 export default function AppShell() {
-    const [activeTab, setActiveTab] = useState('recipe');
+    const [activeTab, setActiveTab] = useState('techniques');
 
     return (
         <div className="min-h-screen bg-bg-primary relative overflow-x-hidden text-text-primary selection:bg-accent-amber selection:text-bg-primary">

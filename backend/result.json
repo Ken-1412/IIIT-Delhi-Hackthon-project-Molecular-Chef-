@@ -1,0 +1,17 @@
+{
+  "inputIngredient": "mango",
+  "flavorPairs": [],
+  "similarFlavorMolecules": [],
+  "nutritionSamples": [],
+  "calorieFilteredRecipes": [],
+  "recommendedSubstitutes": [
+    {
+      "ingredient": "pineapple",
+      "reason": "Similar sweet-tropical flavor + low calorie"
+    },
+    {
+      "ingredient": "papaya",
+      "reason": "Sweet flavor profile + healthier digestion"
+    }
+  ]
+}

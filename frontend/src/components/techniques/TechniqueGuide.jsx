@@ -177,7 +177,7 @@ export default function TechniqueGuide() {
                         <div key={vid.id} className="group">
                             <div className="relative aspect-[9/16] rounded-xl overflow-hidden border border-border bg-bg-elevated transition-all duration-300 group-hover:border-accent-amber/40 group-hover:shadow-[0_0_20px_rgba(232,160,48,0.1)]">
                                 <iframe
-                                    src={`https://www.youtube.com/embed/${vid.id}?rel=0`}
+                                    src={`https://www.youtube.com/embed/${vid.id}?autoplay=1&mute=1&loop=1&playlist=${vid.id}&rel=0&controls=1&modestbranding=1`}
                                     title={vid.label}
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                     allowFullScreen

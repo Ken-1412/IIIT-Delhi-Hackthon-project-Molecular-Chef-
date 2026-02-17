@@ -12,9 +12,9 @@ export default function NavBar({ activeTab, onTabChange }) {
     }, []);
 
     const tabs = [
+        { id: 'techniques', label: 'Technique Guides', icon: '⌬' },
         { id: 'recipe', label: 'Recipe Builder', icon: '☍' },
         { id: 'substitution', label: 'Substitution Finder', icon: '⇄' },
-        { id: 'techniques', label: 'Technique Guides', icon: '⌬' },
     ];
 
     return (
